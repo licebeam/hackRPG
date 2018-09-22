@@ -7,20 +7,25 @@ const Container = styled.div`
   background-color: black;
   display: flex;
   flex-direction: column;
-  .terminal-use{
+  .last-command{
+    flex: 4;
+    flex-direction: column;
     display: flex;
-    flex-direction: row;
-    .terminal-talker{
-      background: none;
-      border: none;
-      padding: 20px;
-      color: white;
-      font-size: 2rem;
+    overflow: hidden;
+    .com-item{
+      color: greenyellow;
+      padding-left: 20px;
     }
+  }
+  .terminal-use{
+    flex: 1;
+    color: white;
+    background-color: grey;
+    font-size: 2rem;
     .text-container{
       background: none;
       border: none;
-      padding: 20px;
+      padding-left: 20px;
       color: greenyellow;
       font-size: 2rem;
       &:focus{
@@ -33,7 +38,7 @@ const Container = styled.div`
 class Terminal extends Component {
   state = {
     initVal: '',
-    lastCom: '',
+    lastCom: [],
   }
 
   handleChange = (e) => {
@@ -45,12 +50,21 @@ class Terminal extends Component {
     return (
       <Container>
         <div className='last-command'>
-          {lastCom}
+          {lastCom && lastCom.map(message => (
+            <span className='com-item'>{message}</span>
+          ))}
         </div>
         <div className='terminal-use'>
           <input
             className="text-container"
             onChange={this.handleChange}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                this.setState({ lastCom: [...lastCom, e.target.value] })
+              }
+            }
+            }
+            autoFocus='true'
             maxLength='16'
             value={initVal}
           />
