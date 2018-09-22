@@ -8,11 +8,11 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   .last-command{
-    flex: 4;
     flex-direction: column;
     display: flex;
     overflow: hidden;
     .com-item{
+      flex: 1;
       color: greenyellow;
       padding-left: 20px;
     }
@@ -20,14 +20,15 @@ const Container = styled.div`
   .terminal-use{
     flex: 1;
     color: white;
-    background-color: grey;
-    font-size: 2rem;
+    background-color: black;
+    font-size: 1rem;
+    padding-left: 20px;
     .text-container{
       background: none;
       border: none;
       padding-left: 20px;
       color: greenyellow;
-      font-size: 2rem;
+      font-size: 1rem;
       &:focus{
         outline:0;
       }
@@ -44,6 +45,32 @@ class Terminal extends Component {
   handleChange = (e) => {
     this.setState({ initVal: e.target.value })
   }
+  checkCommand = (command) => {
+    const { lastCom, initVal } = this.state;
+    switch (initVal) {
+      case 'clr':
+        this.setState({ lastCom: [...lastCom, 'clearing screen!'], initVal: '' })
+        this.setState({ lastCom: [] })
+        break;
+      case 'ssh':
+        this.sshCommand(initVal);
+        break;
+
+      case 'help':
+        this.setState({
+          lastCom: [...lastCom, 'commands: help, ssh (address), clr'], initVal: ''
+        })
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  sshCommand = (address) => {
+    const { lastCom, initVal } = this.state;
+    this.setState({ lastCom: [...lastCom, initVal], initVal: '' })
+  }
 
   render() {
     const { initVal, lastCom } = this.state
@@ -51,21 +78,23 @@ class Terminal extends Component {
       <Container>
         <div className='last-command'>
           {lastCom && lastCom.map(message => (
-            <span className='com-item'>{message}</span>
+            <span className='com-item'>-- {message}</span>
           ))}
         </div>
         <div className='terminal-use'>
+          ~/user/home/
           <input
             className="text-container"
             onChange={this.handleChange}
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
-                this.setState({ lastCom: [...lastCom, e.target.value] })
+                this.setState({ lastCom: [...lastCom, initVal], initVal: '' })
+                this.checkCommand(initVal);
               }
             }
             }
             autoFocus='true'
-            maxLength='16'
+            maxLength='20'
             value={initVal}
           />
         </div>
