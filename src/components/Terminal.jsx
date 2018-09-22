@@ -40,26 +40,47 @@ class Terminal extends Component {
   state = {
     initVal: '',
     lastCom: [],
+    connection: '',
+
+    commands: {
+      test: {
+        message: 'testing shit'
+      },
+      clr: {
+        message: 'clearing'
+      },
+      ssh: {
+        message: 'You must connect as following - ssh home '
+      },
+      'ssh home': {
+        message: 'connected to Home'
+      },
+      'ssh bank': {
+        message: 'connected to Bank'
+      },
+      'ssh corp-server': {
+        message: 'connected to corp-server'
+      }
+    }
   }
 
   handleChange = (e) => {
     this.setState({ initVal: e.target.value })
   }
   checkCommand = (command) => {
-    const { lastCom, initVal } = this.state;
-    switch (initVal) {
+    const { commands, lastCom, initVal } = this.state
+    if (command in commands) {
+      console.log('test')
+      this.doCommand(command)
+    }
+  }
+  doCommand = (command) => {
+    console.log('doin')
+    const { commands, lastCom, initVal } = this.state
+    this.setState({ lastCom: [...lastCom, commands[command].message], initVal: '' })
+    switch (command) {
       case 'clr':
-        this.setState({ lastCom: [...lastCom, 'clearing screen!'], initVal: '' })
-        this.setState({ lastCom: [] })
-        break;
-      case 'ssh':
-        this.sshCommand(initVal);
-        break;
-
-      case 'help':
-        this.setState({
-          lastCom: [...lastCom, 'commands: help, ssh (address), clr'], initVal: ''
-        })
+        this.clrCommand()
         break;
 
       default:
@@ -67,9 +88,9 @@ class Terminal extends Component {
     }
   }
 
-  sshCommand = (address) => {
-    const { lastCom, initVal } = this.state;
-    this.setState({ lastCom: [...lastCom, initVal], initVal: '' })
+  clrCommand = (command) => { //clear command
+    const { commands, lastCom, initVal } = this.state
+    this.setState({ lastCom: '', initVal: '' })
   }
 
   render() {
@@ -78,7 +99,7 @@ class Terminal extends Component {
       <Container>
         <div className='last-command'>
           {lastCom && lastCom.map(message => (
-            <span className='com-item'>-- {message}</span>
+            <span key={message.index} className='com-item'>-- {message}</span>
           ))}
         </div>
         <div className='terminal-use'>
