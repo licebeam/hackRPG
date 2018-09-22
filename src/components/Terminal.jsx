@@ -7,6 +7,13 @@ const Container = styled.div`
   background-color: black;
   display: flex;
   flex-direction: column;
+  .current-server{
+    padding: 10px;
+    height: 20px;
+    background-color: gray;
+    color: white;
+    padding-left: 20px;
+  }
   .last-command{
     flex-direction: column;
     display: flex;
@@ -41,25 +48,42 @@ class Terminal extends Component {
     initVal: '',
     lastCom: [],
     connection: '',
+    files: 'no files on system',
 
     commands: {
-      test: {
-        message: 'testing shit'
+      ls: {
+        message: 'checking files',
+      },
+      help: {
+        message:
+          'Local Commands: help, clr, ssh, status, logout, check '
       },
       clr: {
         message: 'clearing'
+      },
+      status: {
+        message: 'Status: '
+      },
+      logout: {
+        message: 'Logging Out: '
+      },
+      check: {
+        message: 'Checking: '
       },
       ssh: {
         message: 'You must connect as following - ssh home '
       },
       'ssh home': {
-        message: 'connected to Home'
+        message: 'connected to Home',
+        server: 'Home'
       },
       'ssh bank': {
-        message: 'connected to Bank'
+        message: 'connected to Bank',
+        server: 'Bank'
       },
       'ssh corp-server': {
-        message: 'connected to corp-server'
+        message: 'connected to corp-server',
+        server: 'Corp'
       }
     }
   }
@@ -70,8 +94,11 @@ class Terminal extends Component {
   checkCommand = (command) => {
     const { commands, lastCom, initVal } = this.state
     if (command in commands) {
-      console.log('test')
       this.doCommand(command)
+      commands[command].server ? this.setState({ connection: commands[command].server }) : '';
+    }
+    if (command in commands === false) {
+      this.setState({ lastCom: [...lastCom, 'unknown command'], initVal: '' })
     }
   }
   doCommand = (command) => {
@@ -82,7 +109,12 @@ class Terminal extends Component {
       case 'clr':
         this.clrCommand()
         break;
-
+      case 'ls':
+        this.showFiles()
+        break;
+      case 'logout':
+        this.state.connection !== '' ? this.setState({ connection: '' }) : '';
+        break;
       default:
         break;
     }
@@ -93,10 +125,18 @@ class Terminal extends Component {
     this.setState({ lastCom: '', initVal: '' })
   }
 
+  showFiles = () => { //ls command
+    const { commands, lastCom, initVal } = this.state
+    this.setState({ lastCom: [...lastCom, this.state.files], initVal: '' })
+  }
+
   render() {
     const { initVal, lastCom } = this.state
     return (
       <Container>
+        <div className="current-server">
+          Connected to: {this.state.connection}
+        </div>
         <div className='last-command'>
           {lastCom && lastCom.map(message => (
             <span key={message.index} className='com-item'>-- {message}</span>
@@ -119,7 +159,9 @@ class Terminal extends Component {
             value={initVal}
           />
         </div>
-
+        <div className='current-server'>
+          player
+        </div>
 
       </Container>
     );
